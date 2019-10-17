@@ -1,9 +1,11 @@
 package ua.edu.ucu.tempseries;
 
+import java.util.InputMismatchException;
+
 @FunctionalInterface
-public interface FilterFunction
+interface FilterFunction
 {
-    public abstact bool isEligible(int val, int comparor);
+    public abstract boolean isEligible(double val);
 }
 
 public class TemperatureSeriesAnalysis {
@@ -14,9 +16,8 @@ public class TemperatureSeriesAnalysis {
     private double[] tempValues;
     private int amount;
     
-    @Retention(RetentionPolict.RUNTIME)
-    @Target(ElementType.METHOD)
-    private @interface bool ifNotEmpty() throws IllegalArgumentException
+
+    private void ifNotEmpty() throws IllegalArgumentException
     {
         if (this.amount == 0)
         {
@@ -24,16 +25,16 @@ public class TemperatureSeriesAnalysis {
         }
     }
 
-    private validate(double[] temperatureSeries)
+    private boolean isValid(double[] temperatureSeries)
     {
         for(double value : temperatureSeries)
         {
             if (value < ABSOLUTE_MINIMUM)
             {
-                return 1;
+                return false;
             }
         }
-        return 0;
+        return true;
     }
 
     public TemperatureSeriesAnalysis() 
@@ -46,7 +47,7 @@ public class TemperatureSeriesAnalysis {
 
     public TemperatureSeriesAnalysis(double[] temperatureSeries) throws InputMismatchException
     {
-        if (validate(temperatureSeries) == 1)
+        if (!isValid(temperatureSeries))
         {
             throw new InputMismatchException();
         }
@@ -60,7 +61,7 @@ public class TemperatureSeriesAnalysis {
         }
 
     }
-    @ifNotEmpty
+
     private double getSum() throws IllegalArgumentException
     {
         double sum = 0;
@@ -70,21 +71,38 @@ public class TemperatureSeriesAnalysis {
         }
         return sum;
     }
-    @ifNotEmpty
+
     public double average() 
     {
+        ifNotEmpty();
         double sum = getSum();
         return sum / amount;
     }
+    private double expectedValue()
+    {
+        ifNotEmpty();
+        return getSum() / (double)this.amount;
+    }
+    private double variance()
+    {
+        double exp = expectedValue();
+        double sum = 0;
+        for (double temp : this.tempValues)
+        {
+            sum += Math.pow(temp - exp, 2);
+        }
+        return sum / (double)this.amount;
 
+    }
     public double deviation() 
     {
-        return 0;
+        return Math.sqrt(variance());
     }
 
-    @ifNotEmpty
+
     public double min() 
     {
+        ifNotEmpty();
         double minVal = Integer.MAX_VALUE;
         for (double temp : tempValues)
         {
@@ -96,9 +114,10 @@ public class TemperatureSeriesAnalysis {
         return minVal;
     }
 
-    @ifNotEmpty
+
     public double max() 
     {
+        ifNotEmpty();
         double maxVal = Integer.MIN_VALUE;
         for (double temp : tempValues)
         {
@@ -115,17 +134,22 @@ public class TemperatureSeriesAnalysis {
         return findTempClosestToValue(0);
     }
     
-    @ifNotEmpty
+
     public double findTempClosestToValue(double tempValue) throws IllegalArgumentException
     {    
-        int minTemp = Integer.MAX_VALUE;
+        ifNotEmpty();
+        double minTemp = Integer.MAX_VALUE;
+        double minDiff = Integer.MAX_VALUE;
+        double currentDiff;
         for (double temp: tempValues)
         {
-            if (if abs(abs(temp) - tempValue) < minTemp)
+            currentDiff = Math.abs(Math.abs(temp) - tempValue);
+            if (currentDiff < minDiff)
             {
                 minTemp = temp;
+                minDiff = currentDiff;
             }
-            else if (abs(abs(temp) - tempValue) == minTemp)
+            else if (currentDiff == minDiff)
             {
                 minTemp = (temp > 0) ? temp : minTemp;
             }
@@ -138,7 +162,7 @@ public class TemperatureSeriesAnalysis {
         int index = 0;
         for (double value : values)
         {
-            if (condition.isEligible(value, conditinalValue))
+            if (condition.isEligible(value))
             {
                 filteredTemps[index] = value;
                 index++;
@@ -148,14 +172,14 @@ public class TemperatureSeriesAnalysis {
     }
 
 
-    public double[] findTempsLessThen(double tempValue) 
+    public double[] findTempsLessThen(final double tempValue) 
     {
-        return filter(this.tempValues, n, m -> n < m, tempValue);
+        return filter(this.tempValues, n -> n < tempValue, tempValue);
     }
 
-    public double[] findTempsGreaterThen(double tempValue) 
+    public double[] findTempsGreaterThen(final double tempValue) 
     {
-        return filter(this.tempValues, n, m -> n >= m, tempValue);
+        return filter(this.tempValues, n -> n >= tempValue, tempValue);
     }
 
     public TempSummaryStatistics summaryStatistics() 
@@ -163,7 +187,7 @@ public class TemperatureSeriesAnalysis {
         return new TempSummaryStatistics(min(), max(), average(), deviation());
     }
 
-    private int reserve()
+    private void reserve()
     {
         this.capacity = this.capacity*2;
         double[] newTempValues = new double[this.capacity];
