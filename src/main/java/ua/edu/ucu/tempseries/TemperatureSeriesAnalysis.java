@@ -1,5 +1,6 @@
 package ua.edu.ucu.tempseries;
 
+import java.util.Arrays;
 import java.util.InputMismatchException;
 
 @FunctionalInterface
@@ -10,8 +11,8 @@ interface FilterFunction
 
 public class TemperatureSeriesAnalysis {
     
-    private final static int ABSOLUTE_MINIMUM = -273;
-    private final static double EPSILON = 0.0001;
+    private static final int ABSOLUTE_MINIMUM = -273;
+    private static final double EPSILON = 0.0001;
     
     private int capacity;
     private double[] tempValues;
@@ -39,9 +40,26 @@ public class TemperatureSeriesAnalysis {
             this.tempValues[amount] = temp;
             amount++;
         }
-
+        
     }
-
+    public double[] getTempValues() 
+    {
+        return tempValues;
+    }
+    
+    public double getTempValue(int index)
+    {
+        if (index > this.capacity)
+        {
+            throw new IllegalArgumentException();
+        }
+        return this.tempValues[index];
+    }
+    private void setTempValues(double[] tempValues) 
+    {
+        this.tempValues = tempValues;
+    }
+    
     private void ifNotEmpty() throws IllegalArgumentException
     {
         if (this.amount == 0)
@@ -49,7 +67,7 @@ public class TemperatureSeriesAnalysis {
             throw new IllegalArgumentException();
         }
     }
-
+    
     private boolean isValid(double[] temperatureSeries)
     {
         for (double value : temperatureSeries)
@@ -159,7 +177,7 @@ public class TemperatureSeriesAnalysis {
     }
     private double[] filter(double[] values, FilterFunction condition)
     {
-        double[] filteredTemps = new double[this.capacity];
+        double[] filteredTemps = new double[this.amount];
         int index = 0;
         for (double value : values)
         {
@@ -169,9 +187,8 @@ public class TemperatureSeriesAnalysis {
                 index++;
             }
         }
-        return filteredTemps;
+        return Arrays.copyOfRange(filteredTemps, 0, index);
     }
-
 
     public double[] findTempsLessThen(final double tempValue) 
     {
@@ -180,7 +197,7 @@ public class TemperatureSeriesAnalysis {
 
     public double[] findTempsGreaterThen(final double tempValue) 
     {
-        return filter(this.tempValues, n -> n >= tempValue);
+        return filter(this.tempValues, n -> n > tempValue);
     }
 
     public TempSummaryStatistics summaryStatistics() 
@@ -190,10 +207,22 @@ public class TemperatureSeriesAnalysis {
 
     private void reserve()
     {
-        this.capacity = this.capacity*2;
+        this.capacity = this.capacity != 0 ? this.capacity*2 : 2;
         double[] newTempValues = new double[this.capacity];
         System.arraycopy(this.tempValues, 0, newTempValues, 0, this.amount);
         this.tempValues = newTempValues;
+    }
+    
+    private void shrink()
+    {
+        double[] shrinkedArray = new double[this.amount];
+        int index = 0;
+        while (index < this.amount)
+        {
+            shrinkedArray[index] = getTempValue(index);
+            index++;
+        }
+        setTempValues(shrinkedArray);
     }
 
     private int addTemp(double temp)
@@ -201,12 +230,12 @@ public class TemperatureSeriesAnalysis {
         if (this.amount >= this.capacity)
         {
             reserve();
+            return addTemp(temp);
         }
-        amount++;
         this.tempValues[amount] = temp;
+        amount++;
         return 0;
     }
-
     public int addTemps(double... temps) throws InputMismatchException 
     {
         for (double temp : temps)
@@ -220,6 +249,7 @@ public class TemperatureSeriesAnalysis {
         {
             addTemp(temp);
         }
+        shrink();
         return amount;
     }
 }
