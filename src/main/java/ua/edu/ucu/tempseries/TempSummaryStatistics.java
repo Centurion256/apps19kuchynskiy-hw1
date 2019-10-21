@@ -2,15 +2,15 @@ package ua.edu.ucu.tempseries;
 
 public class TempSummaryStatistics 
 {
-    private double minimal, maximal, average, standard_deviation;
+    private double minimal, maximal, average, standardDeviation;
 
     TempSummaryStatistics(double minimal, double maximal,
-                          double average, double standard_deviation)
+                          double average, double standardDeviation)
     {
         this.minimal = minimal;
         this.maximal = maximal;
         this.average = average;
-        this.standard_deviation = standard_deviation;  
+        this.standardDeviation = standardDeviation;  
     }
 
     public double getMinimal() 
@@ -28,25 +28,25 @@ public class TempSummaryStatistics
         return average;
     }
     
-    public double getStandard_deviation() 
+    public double getStandardDeviation() 
     {
 
-        return standard_deviation;
+        return standardDeviation;
     }
     @Override
     public int hashCode() 
     {
-        final int prime = 31;
+        final int PRIME = 31;
         int result = 1;
         long temp;
         temp = Double.doubleToLongBits(average);
-        result = prime * result + (int) (temp ^ (temp >>> 32));
+        result = PRIME * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(maximal);
-        result = prime * result + (int) (temp ^ (temp >>> 32));
+        result = PRIME * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(minimal);
-        result = prime * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(standard_deviation);
-        result = prime * result + (int) (temp ^ (temp >>> 32));
+        result = PRIME * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(standardDeviation);
+        result = PRIME * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
 
@@ -54,11 +54,17 @@ public class TempSummaryStatistics
     public boolean equals(Object obj) 
     {
         if (this == obj)
+        {
             return true;
+        }
         if (obj == null)
+        {
             return false;
+        }
         if (getClass() != obj.getClass())
+        {
             return false;
+        }
         TempSummaryStatistics other = (TempSummaryStatistics) obj;
         if (Double.doubleToLongBits(average) != Double.doubleToLongBits(other.average))
         {
@@ -72,7 +78,7 @@ public class TempSummaryStatistics
         {
             return false;
         }
-        if (Double.doubleToLongBits(standard_deviation) != Double.doubleToLongBits(other.standard_deviation))
+        if (Double.doubleToLongBits(standardDeviation) != Double.doubleToLongBits(other.standardDeviation))
         {
             return false;
         }

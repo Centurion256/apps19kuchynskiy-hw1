@@ -289,8 +289,24 @@ public class TemperatureSeriesAnalysisTest {
 
         double[] temperatureSeries = {2.0, 3.0, -5.0};
         TemperatureSeriesAnalysis seriesAnalysis = new TemperatureSeriesAnalysis(temperatureSeries);
-        double deviation = 4.35;
+        double deviation = 3.55;
 
         assertEquals(deviation, seriesAnalysis.deviation(), 0.01);
+    }
+    @Test
+    public void testCreateTempSummaryStatistics() {
+
+        double[] temperatureSeries = {2.0, 3.0, -5.0};
+        TemperatureSeriesAnalysis  seriesAnalysis = new TemperatureSeriesAnalysis(temperatureSeries);
+        TempSummaryStatistics seriesStats = seriesAnalysis.summaryStatistics();
+        double average = 0.0;
+        double min = -5.0;
+        double max = 3.0;
+        double std = 3.55;
+
+        assertEquals(average, seriesStats.getAverage(), 0.01);
+        assertEquals(min, seriesStats.getMinimal(), 0.01);
+        assertEquals(max, seriesStats.getMaximal(), 0.01);
+        assertEquals(std, seriesStats.getStandardDeviation(), 0.01);
     }
 }

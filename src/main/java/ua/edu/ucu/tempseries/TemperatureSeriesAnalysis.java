@@ -44,7 +44,7 @@ public class TemperatureSeriesAnalysis {
     }
     public double[] getTempValues() 
     {
-        return tempValues;
+        return Arrays.copyOf(tempValues, tempValues.length);
     }
     
     public double getTempValue(int index)
@@ -55,9 +55,9 @@ public class TemperatureSeriesAnalysis {
         }
         return this.tempValues[index];
     }
-    private void setTempValues(double[] tempValues) 
+    private void setTempValues(double[] newTempValues) 
     {
-        this.tempValues = tempValues;
+        this.tempValues = newTempValues;
     }
     
     private void ifNotEmpty() throws IllegalArgumentException
@@ -197,7 +197,7 @@ public class TemperatureSeriesAnalysis {
 
     public double[] findTempsGreaterThen(final double tempValue) 
     {
-        return filter(this.tempValues, n -> n > tempValue);
+        return filter(this.tempValues, n -> n >= tempValue);
     }
 
     public TempSummaryStatistics summaryStatistics() 
