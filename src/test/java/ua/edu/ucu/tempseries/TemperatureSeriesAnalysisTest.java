@@ -42,7 +42,21 @@ public class TemperatureSeriesAnalysisTest {
         
         assertEquals(expResult, actualResult, 0.00001);        
     }
-    
+    @Test
+    public void testAverageAdd() {
+        TemperatureSeriesAnalysis seriesAnalysis = new TemperatureSeriesAnalysis();
+        double expResult = 1.0;
+        double actualResult;
+        double[] temps = {1.0};
+        for (int i = 0; i < 10; i++) {
+
+            seriesAnalysis.addTemps(temps);
+            actualResult = seriesAnalysis.average();
+            assertEquals(expResult, actualResult, 0.00001);
+        }
+
+    }
+
     @Test
     public void testMin() {
 

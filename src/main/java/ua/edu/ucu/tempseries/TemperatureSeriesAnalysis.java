@@ -44,12 +44,12 @@ public class TemperatureSeriesAnalysis {
     }
     public double[] getTempValues() 
     {
-        return Arrays.copyOf(tempValues, tempValues.length);
+        return Arrays.copyOf(tempValues, this.amount);
     }
     
     public double getTempValue(int index)
     {
-        if (index > this.capacity)
+        if (index > this.amount)
         {
             throw new IllegalArgumentException();
         }
@@ -84,8 +84,9 @@ public class TemperatureSeriesAnalysis {
     private double getSum() throws IllegalArgumentException
     {
         double sum = 0;
-        for (double temp : tempValues)
+        for (int index = 0; index < this.amount; index++)
         {
+            double temp = this.tempValues[index];
             sum += temp;
         }
         return sum;
@@ -106,8 +107,9 @@ public class TemperatureSeriesAnalysis {
     {
         double exp = expectedValue();
         double sum = 0;
-        for (double temp : this.tempValues)
+        for (int index = 0; index < this.amount; index++)
         {
+            double temp = this.tempValues[index];
             sum += Math.pow(temp - exp, 2);
         }
         return sum / (double) this.amount;
@@ -123,8 +125,9 @@ public class TemperatureSeriesAnalysis {
     {
         ifNotEmpty();
         double minVal = Integer.MAX_VALUE;
-        for (double temp : tempValues)
+        for (int index = 0; index < this.amount; index++)
         {
+            double temp = this.tempValues[index];
             if (temp < minVal)
             {
                 minVal = temp;
@@ -138,8 +141,9 @@ public class TemperatureSeriesAnalysis {
     {
         ifNotEmpty();
         double maxVal = Integer.MIN_VALUE;
-        for (double temp : tempValues)
+        for (int index = 0; index < this.amount; index++)
         {
+            double temp = this.tempValues[index];
             if (temp > maxVal)
             {
                 maxVal = temp;
@@ -160,8 +164,9 @@ public class TemperatureSeriesAnalysis {
         double minTemp = Integer.MAX_VALUE;
         double minDiff = Integer.MAX_VALUE;
         double currentDiff;
-        for (double temp: tempValues)
+        for (int index = 0; index < this.amount; index++)
         {
+            double temp = this.tempValues[index];
             currentDiff = Math.abs(Math.abs(temp) - tempValue);
             if (currentDiff < minDiff)
             {
@@ -192,12 +197,12 @@ public class TemperatureSeriesAnalysis {
 
     public double[] findTempsLessThen(final double tempValue) 
     {
-        return filter(this.tempValues, n -> n < tempValue);
+        return filter(getTempValues(), n -> n < tempValue);
     }
 
     public double[] findTempsGreaterThen(final double tempValue) 
     {
-        return filter(this.tempValues, n -> n >= tempValue);
+        return filter(getTempValues(), n -> n >= tempValue);
     }
 
     public TempSummaryStatistics summaryStatistics() 
@@ -208,21 +213,8 @@ public class TemperatureSeriesAnalysis {
     private void reserve()
     {
         this.capacity = this.capacity != 0 ? this.capacity*2 : 2;
-        double[] newTempValues = new double[this.capacity];
-        System.arraycopy(this.tempValues, 0, newTempValues, 0, this.amount);
-        this.tempValues = newTempValues;
-    }
-    
-    private void shrink()
-    {
-        double[] shrinkedArray = new double[this.amount];
-        int index = 0;
-        while (index < this.amount)
-        {
-            shrinkedArray[index] = getTempValue(index);
-            index++;
-        }
-        setTempValues(shrinkedArray);
+        double[] newTempValues = Arrays.copyOf(this.tempValues, this.capacity);
+        setTempValues(newTempValues);
     }
 
     private int addTemp(double temp)
@@ -249,7 +241,7 @@ public class TemperatureSeriesAnalysis {
         {
             addTemp(temp);
         }
-        shrink();
+        //shrink();
         return amount;
     }
 }

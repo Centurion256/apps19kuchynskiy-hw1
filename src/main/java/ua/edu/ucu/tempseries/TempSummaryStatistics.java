@@ -66,23 +66,10 @@ public class TempSummaryStatistics
             return false;
         }
         TempSummaryStatistics other = (TempSummaryStatistics) obj;
-        if (Double.doubleToLongBits(average) != Double.doubleToLongBits(other.average))
-        {
-            return false;
-        }
-        if (Double.doubleToLongBits(maximal) != Double.doubleToLongBits(other.maximal))
-        {
-            return false;
-        }
-        if (Double.doubleToLongBits(minimal) != Double.doubleToLongBits(other.minimal))
-        {
-            return false;
-        }
-        if (Double.doubleToLongBits(standardDeviation) != Double.doubleToLongBits(other.standardDeviation))
-        {
-            return false;
-        }
-        return true;
+        return minimal == other.minimal &&
+                maximal == other.maximal &&
+                average == other.average &&
+                standardDeviation == other.standardDeviation;
     }
 
 
