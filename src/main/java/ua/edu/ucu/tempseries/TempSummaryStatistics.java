@@ -66,10 +66,10 @@ public class TempSummaryStatistics
             return false;
         }
         TempSummaryStatistics other = (TempSummaryStatistics) obj;
-        return minimal == other.minimal &&
-                maximal == other.maximal &&
-                average == other.average &&
-                standardDeviation == other.standardDeviation;
+        return minimal == other.minimal 
+                && maximal == other.maximal 
+                && average == other.average 
+                && standardDeviation == other.standardDeviation;
     }
 
 

@@ -2,12 +2,9 @@ package ua.edu.ucu.tempseries;
 
 import java.util.Arrays;
 import java.util.InputMismatchException;
-
-@FunctionalInterface
-interface FilterFunction
-{
-    boolean isEligible(double val);
-}
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.List;
 
 public class TemperatureSeriesAnalysis {
     
@@ -124,32 +121,18 @@ public class TemperatureSeriesAnalysis {
     public double min() 
     {
         ifNotEmpty();
-        double minVal = Integer.MAX_VALUE;
-        for (int index = 0; index < this.amount; index++)
-        {
-            double temp = this.tempValues[index];
-            if (temp < minVal)
-            {
-                minVal = temp;
-            }
-        }
-        return minVal;
+        //Cannot use Arrays.AsList here, since this.TempValues is an array of primitives, use this conversion isntead:
+        List<Double> list = Arrays.stream(this.tempValues).boxed().collect(Collectors.toList());
+        return list.stream().min((i, j) -> i.compareTo(j)).get();
     }
 
 
     public double max() 
     {
         ifNotEmpty();
-        double maxVal = Integer.MIN_VALUE;
-        for (int index = 0; index < this.amount; index++)
-        {
-            double temp = this.tempValues[index];
-            if (temp > maxVal)
-            {
-                maxVal = temp;
-            }
-        }
-        return maxVal;
+        List<Double> list = Arrays.stream(this.tempValues).boxed().collect(Collectors.toList());
+        return list.stream().max((i, j) -> i.compareTo(j)).get();
+
     }
 
     public double findTempClosestToZero()
@@ -180,13 +163,13 @@ public class TemperatureSeriesAnalysis {
         }
         return minTemp;
     }
-    private double[] filter(double[] values, FilterFunction condition)
+    private double[] filter(double[] values, Predicate<Double> condition)
     {
         double[] filteredTemps = new double[this.amount];
         int index = 0;
         for (double value : values)
         {
-            if (condition.isEligible(value))
+            if (condition.test(value))
             {
                 filteredTemps[index] = value;
                 index++;
